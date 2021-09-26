@@ -11,7 +11,7 @@ for i in range(n):
     intervals.append((start, finish, weight))
 
 intervals = sorted(intervals, key=lambda tup: tup[1])
-    
+
 def recursion(i):
     if i == 0:
         cache[i] = intervals[i][2]

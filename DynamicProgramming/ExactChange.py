@@ -1,4 +1,4 @@
-import sys 
+import sys
 
 def cost(amount):
     if amount < min(bills):
