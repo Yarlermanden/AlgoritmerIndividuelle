@@ -12,17 +12,28 @@ for i in range(n):
 
 intervals = sorted(intervals, key=lambda tup: tup[1])
 
-def recursion(i):
+def findCompatibleSchedule(i):
+    high = i-1
+    low = -1
+    start = intervals[i][0]
+    while(high >= low):
+        mid = int((high+low)/2)
+        if(intervals[mid][1] <= start):
+            if(intervals[mid+1][1] <= start):
+                low = mid+1
+            else:
+                return mid
+        else:
+            high = mid-1
+    return -1
+
+
+def optimal(i):
     if i == 0:
         cache[i] = intervals[i][2]
         return
 
-    j = i-1
-    start = intervals[i][0]
-    while(j > -1):
-        if intervals[j][1] <= start:
-            break
-        j -= 1
+    j = findCompatibleSchedule(i)
 
     if j == -1:
         takeCurrent = intervals[i][2]
@@ -32,7 +43,7 @@ def recursion(i):
     cache[i] = max(takeCurrent, skipCurrent)
 
 for i in range(n):
-    recursion(i)
+    optimal(i)
 
 print(cache[n-1])
 
