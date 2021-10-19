@@ -11,6 +11,8 @@ public class Paintball
     private static Node[] _playersToShoot;
     private static Node[] _playersToBeShot;
     private static int[] _results;
+    private static HashSet<Node> _visited;
+    private static Dictionary<Node, Node> _previous;
 
     public static void Main(string[] args)
     {
@@ -69,58 +71,48 @@ public class Paintball
 
     private static void AugmentNetwork()
     {
-        while (true) //augment by finding best path
+        while (true)
         {
-            var queue = new Queue<(Node, Node)>();
-            var visited = new HashSet<Node>();
-            var previous = new Dictionary<Node, Node>();
-            queue.Enqueue((_source, null));
-            Node currentNode;
-            Node previousNode;
-            do //find best path - breadth first search
-            {
-                (currentNode, previousNode) = queue.Dequeue();
-                if (visited.Contains(currentNode)) continue;
-                previous.Add(currentNode, previousNode);
-                if (currentNode == _sink) break;
-                visited.Add(currentNode);
-
-                foreach (var e in currentNode.OutgoingEdges)
-                {
-                    if (e.Capacity > 0)
-                    {
-                        queue.Enqueue((e.To, currentNode));
-                    }
-                }
-            } while (queue.Count > 0);
-
+            _visited = new HashSet<Node>();
+            _previous = new Dictionary<Node, Node>();
+            var currentNode = FindPossiblePath(_source, null);
             if (currentNode != _sink) break;
-
-            //push flow through this path
-            currentNode = _sink;
-            while (currentNode != _source)
-            {
-                previousNode = previous[currentNode];
-                var edge1 = previousNode.OutgoingEdges.Single(edge => edge.To == currentNode);
-                edge1.Capacity -= 1;
-
-                var residualEdge = currentNode.OutgoingEdges.Single(edge => edge.To == previousNode);
-                residualEdge.Capacity += 1;
-                //find the edge used
-
-                currentNode = previousNode;
-            }
+            PushFlow();
         }
     }
 
-    private static void FindPossiblePath()
+    private static Node FindPossiblePath(Node currentNode, Node previousNode)
     {
+        if (_visited.Contains(currentNode)) return null;
+        _previous.Add(currentNode, previousNode);
+        if (currentNode == _sink) return currentNode;
+        _visited.Add(currentNode);
 
+        foreach (var e in currentNode.OutgoingEdges)
+        {
+            if (e.Capacity > 0)
+            {
+                var node = FindPossiblePath(e.To, currentNode);
+                if (node == _sink) return node;
+            }
+        }
+        return null;
     }
 
     private static void PushFlow()
     {
+        var currentNode = _sink;
+        while (currentNode != _source)
+        {
+            var previousNode = _previous[currentNode];
+            var edge1 = previousNode.OutgoingEdges.Single(edge => edge.To == currentNode);
+            edge1.Capacity -= 1;
 
+            var residualEdge = currentNode.OutgoingEdges.Single(edge => edge.To == previousNode);
+            residualEdge.Capacity += 1;
+
+            currentNode = previousNode;
+        }
     }
 
     private static void OrderResultForOutput()
