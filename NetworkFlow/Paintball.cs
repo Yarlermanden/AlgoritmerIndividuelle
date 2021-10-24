@@ -62,10 +62,10 @@ public class Paintball
         for (int i = 0; i < _n; i++)
         {
             _source.OutgoingEdges.Add(new Edge(_source, _playersToShoot[i], 1));
-            _playersToShoot[i].OutgoingEdges.Add(new Edge(_playersToShoot[i], _source, 1, true));
+            _playersToShoot[i].OutgoingEdges.Add(new Edge(_playersToShoot[i], _source, 0, true));
 
             _playersToBeShot[i].OutgoingEdges.Add(new Edge(_playersToBeShot[i], _sink, 1));
-            _sink.OutgoingEdges.Add(new Edge(_sink, _playersToBeShot[i], 1, true));
+            _sink.OutgoingEdges.Add(new Edge(_sink, _playersToBeShot[i], 0, true));
         }
     }
 
@@ -105,10 +105,10 @@ public class Paintball
         while (currentNode != _source)
         {
             var previousNode = _previous[currentNode];
-            var edge1 = previousNode.OutgoingEdges.Single(edge => edge.To == currentNode);
-            edge1.Capacity -= 1;
+            var outgoingEdge = previousNode.OutgoingEdges.Single(edge => edge.To == currentNode);
+            outgoingEdge.Capacity -= 1;
 
-            var residualEdge = currentNode.OutgoingEdges.Single(edge => edge.To == previousNode);
+            var residualEdge = currentNode.OutgoingEdges.Single(edge => edge.To == previousNode); //todo this is slow - make it faster
             residualEdge.Capacity += 1;
 
             currentNode = previousNode;
@@ -124,7 +124,8 @@ public class Paintball
             {
                 if (e2.Capacity == 0 && !e2.Residual)
                 {
-                    _results[e2.From.Id] = e2.To.Id + 1;
+                    _results[e2.From.Id] = e2.To.Id + 1; 
+                    break;
                 }
             }
         }
