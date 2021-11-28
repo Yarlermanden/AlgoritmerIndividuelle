@@ -25,7 +25,7 @@ namespace DivideAndConquer
             for (int i = 0; i < n; i++)
             {
                 var arr = Console.ReadLine().Split(' ');
-                list[i] = new Point(float.Parse(arr[0]), float.Parse(arr[1]));
+                list[i] = new Point(double.Parse(arr[0]), double.Parse(arr[1]));
             }
             return list;
         }
@@ -36,9 +36,8 @@ namespace DivideAndConquer
             var pointsSortedY = new Point[points.Length];
             Array.Copy(points, pointsSortedX, points.Length);
             Array.Copy(points, pointsSortedY, points.Length);
-            Array.Sort(pointsSortedX, (a, b) => a.X.CompareTo(b.X));
-            Array.Sort(pointsSortedY, (a, b) => a.Y.CompareTo(b.Y));
-            for (int i = 0; i < points.Length ; i++) pointsSortedX[i].Id = i;
+            Array.Sort(pointsSortedX, (a, b) => (!a.X.Equals(b.X)) ? a.X.CompareTo(b.X) : a.Y.CompareTo(b.Y));
+            Array.Sort(pointsSortedY, (a, b) => (!a.Y.Equals(b.Y)) ? a.Y.CompareTo(b.Y) : a.X.CompareTo(b.X));
 
             var (p1, p2, _) = FindClosestPair(pointsSortedX, pointsSortedY);
             return (p1, p2);
@@ -52,23 +51,17 @@ namespace DivideAndConquer
             var Rx = new Point[Px.Length - Qx.Length];
             Array.Copy(Px, Qx, Qx.Length);
             Array.Copy(Px, Px.Length/2, Rx, 0, Rx.Length);
-            var splitX = Qx[Qx.Length - 1];
             var Qy = new Point[Qx.Length];
             var Ry = new Point[Rx.Length];
-            var q = 0;
-            var r = 0;
+            int qi = 0, ri = 0;
+            Point midPoint = Qx[Qx.Length - 1];
             foreach(var p in Py)
             {
-                if (p.Id > splitX.Id)
+                if (p.X > midPoint.X || ((p.X.Equals(midPoint.X) && p.Y > midPoint.Y) && ri < Rx.Length) || qi == Qx.Length)
                 {
-                    Ry[r] = p; 
-                    r++;
+                    Ry[ri++] = p;
                 }
-                else
-                {
-                    Qy[q] = p;
-                    q++;
-                }
+                else Qy[qi++] = p;
             }
 
             var (pLeft1, pLeft2, min1) = FindClosestPair(Qx, Qy);
@@ -90,17 +83,14 @@ namespace DivideAndConquer
                 p2 = pLeft2;
             }
 
-            var maxQx = Qx[Qx.Length- 1].X;
-            var minRangeX = maxQx - d;
-            var maxRangeX = maxQx + d;
-
             var s = new List<Point>();
-            foreach(var p in Py) if(p.X > minRangeX && p.X <= maxRangeX) s.Add(p);
+            foreach(var p in Py) if(Math.Abs(p.X - midPoint.X) < d) s.Add(p);
+            double dist = 0;
             for (int i = 0; i < s.Count; i++)
             {
-                for (int j = i + 1; j < Math.Min(i + 3, s.Count); j++)
+                for (int j = i + 1; j < s.Count && (s[j].Y - s[i].Y < d); j++)
                 {
-                    var dist = s[i].DistanceTo(s[j]);
+                    dist = s[i].DistanceTo(s[j]);
                     if (d > dist)
                     {
                         d = dist;
@@ -117,11 +107,13 @@ namespace DivideAndConquer
             double min = float.MaxValue;
             Point p1 = points[0];
             Point p2 = points[1];
-            for (int i = 0; i < points.Length; i++)
+            int n = points.Length;
+            double dist = 0;
+            for (int i = 0; i < n; i++)
             {
-                for (int j = i + 1; j < points.Length; j++)
+                for (int j = i + 1; j < n; j++)
                 {
-                    var dist = points[i].DistanceTo(points[j]);
+                    dist = points[i].DistanceTo(points[j]);
                     if (min > dist)
                     {
                         min = dist;
@@ -135,10 +127,9 @@ namespace DivideAndConquer
         
         private class Point
         {
-            public float X { get; set; }
-            public float Y { get; set; }
-            public int Id { get; set; }
-            public Point(float x, float y)
+            public double X { get; set; }
+            public double Y { get; set; }
+            public Point(double x, double y)
             {
                 X = x;
                 Y = y;

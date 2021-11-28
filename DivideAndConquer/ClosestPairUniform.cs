@@ -26,7 +26,7 @@ namespace DivideAndConquer
             for (int i = 0; i < n; i++)
             {
                 var arr = Console.ReadLine().Split(' ');
-                list[i] = new Point(float.Parse(arr[0]), float.Parse(arr[1]));
+                list[i] = new Point(double.Parse(arr[0]), double.Parse(arr[1]));
             }
             return list;
         }
@@ -53,14 +53,14 @@ namespace DivideAndConquer
             var Rx = new Point[Px.Length - Qx.Length];
             Array.Copy(Px, Qx, Qx.Length);
             Array.Copy(Px, Px.Length/2, Rx, 0, Rx.Length);
-            var splitX = Qx[Qx.Length - 1];
+            Point midPoint = Qx[Qx.Length - 1];
             var Qy = new Point[Qx.Length];
             var Ry = new Point[Rx.Length];
             var q = 0;
             var r = 0;
             foreach(var p in Py)
             {
-                if (p.Id > splitX.Id)
+                if (p.Id > midPoint.Id)
                 {
                     Ry[r] = p; 
                     r++;
@@ -91,20 +91,20 @@ namespace DivideAndConquer
                 p2 = pLeft2;
             }
 
-            var maxQx = Qx[Qx.Length- 1].X;
-            var minRangeX = maxQx - d;
-            var maxRangeX = maxQx + d;
-            
             var s = new List<Point>();
-            foreach(var p in Py) if(p.X > minRangeX && p.X <= maxRangeX) s.Add(p);
+            foreach(var p in Py) if(Math.Abs(p.X - midPoint.X) < d) s.Add(p);
+            double dist = 0;
             for (int i = 0; i < s.Count-1; i++)
             {
-                var dist = s[i].DistanceTo(s[i + 1]);
-                if (d > dist)
+                for (int j = i + 1; j < s.Count && (s[j].Y - s[i].Y < d); j++)
                 {
-                    d = dist;
-                    p1 = s[i];
-                    p2 = s[i + 1];
+                    dist = s[i].DistanceTo(s[j]);
+                    if (d > dist)
+                    {
+                        d = dist;
+                        p1 = s[i];
+                        p2 = s[j];
+                    }
                 }
             }
             return (p1, p2, d);
@@ -135,10 +135,10 @@ namespace DivideAndConquer
     
     public class Point
     {
-        public float X { get; set; }
-        public float Y { get; set; }
+        public double X { get; set; }
+        public double Y { get; set; }
         public int Id { get; set; }
-        public Point(float x, float y)
+        public Point(double x, double y)
         {
             X = x;
             Y = y;
