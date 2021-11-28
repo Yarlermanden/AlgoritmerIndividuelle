@@ -20,40 +20,52 @@ namespace DivideAndConquer
             }
         }
 
-        private static List<Point> ReadInput(int n)
+        private static Point[] ReadInput(int n)
         {
-            var list = new List<Point>();
+            var list = new Point[n];
             for (int i = 0; i < n; i++)
             {
                 var arr = Console.ReadLine().Split(' ');
-                list.Add(new Point(float.Parse(arr[0]), float.Parse(arr[1])));
+                list[i] = new Point(float.Parse(arr[0]), float.Parse(arr[1]));
             }
             return list;
         }
 
-        private static (Point, Point) DivideAndConquer(List<Point> points)
+        private static (Point, Point) DivideAndConquer(Point[] points)
         {
-            var pointsSortedX = points.OrderBy(p => p.X).ToList();
-            var pointsSortedY = points.OrderBy(p => p.Y).ToList();
-            for (int i = 0; i < points.Count; i++) pointsSortedX[i].Id = i;
+            var pointsSortedX = points.OrderBy(p => p.X).ToArray();
+            var pointsSortedY = points.OrderBy(p => p.Y).ToArray();
+            for (int i = 0; i < points.Length ; i++) pointsSortedX[i].Id = i;
 
             var (p1, p2, _) = FindClosestPair(pointsSortedX, pointsSortedY);
             return (p1, p2);
         }
 
-        private static (Point, Point, double) FindClosestPair(List<Point> Px, List<Point> Py)
+        private static (Point, Point, double) FindClosestPair(Point[] Px, Point[] Py)
         {
-            if (Py.Count <= 3) return BruteForce(Py);
+            if (Py.Length <= 3) return BruteForce(Py);
 
-            var Qx = Px.GetRange(0, Px.Count / 2);
-            var Rx = Px.GetRange(Px.Count / 2, Px.Count - Qx.Count);
-            var splitX = Qx[Qx.Count - 1];
-            var Qy = new List<Point>();
-            var Ry = new List<Point>();
-            foreach (var p in Py)
+            var Qx = new Point[Px.Length/2];
+            var Rx = new Point[Px.Length - Qx.Length];
+            Array.Copy(Px, Qx, Qx.Length);
+            Array.Copy(Px, Px.Length/2, Rx, 0, Rx.Length);
+            var splitX = Qx[Qx.Length - 1];
+            var Qy = new Point[Qx.Length];
+            var Ry = new Point[Rx.Length];
+            var q = 0;
+            var r = 0;
+            foreach(var p in Py)
             {
-                if(p.Id > splitX.Id) Ry.Add(p);
-                else Qy.Add(p);
+                if (p.Id > splitX.Id)
+                {
+                    Ry[r] = p; 
+                    r++;
+                }
+                else
+                {
+                    Qy[q] = p;
+                    q++;
+                }
             }
 
             var (pLeft1, pLeft2, min1) = FindClosestPair(Qx, Qy);
@@ -70,7 +82,7 @@ namespace DivideAndConquer
             }
             var dSqrt = Math.Sqrt(d);
 
-            var maxQx = Qx[Qx.Count - 1].X;
+            var maxQx = Qx[Qx.Length- 1].X;
             var minRangeX = maxQx - dSqrt;
             var maxRangeX = maxQx + dSqrt;
 
@@ -89,14 +101,14 @@ namespace DivideAndConquer
             return (p1, p2, d);
         }
 
-        private static (Point, Point, double) BruteForce(List<Point> points)
+        private static (Point, Point, double) BruteForce(Point[] points)
         {
             double min = float.MaxValue;
             Point p1 = points[0];
             Point p2 = points[1];
-            for (int i = 0; i < points.Count; i++)
+            for (int i = 0; i < points.Length; i++)
             {
-                for (int j = i + 1; j < points.Count; j++)
+                for (int j = i + 1; j < points.Length; j++)
                 {
                     var dist = points[i].DistanceTo(points[j]);
                     if (min > dist)
@@ -125,8 +137,6 @@ namespace DivideAndConquer
 
         public double DistanceTo(Point p)
         {
-            //return Math.Sqrt(Math.Pow(X - p.X, 2) + Math.Pow(Y - p.Y, 2));
-            //return Math.Sqrt((X - p.X)*(X-p.X) + (Y - p.Y)*(Y-p.Y));
             return (X - p.X) * (X - p.X) + (Y - p.Y) * (Y - p.Y);
         }
     }
