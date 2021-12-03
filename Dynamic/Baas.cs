@@ -10,7 +10,7 @@ namespace Dynamic
         public static void Main()
         {
             int n = int.Parse(Console.ReadLine());
-            int?[,,] arr3D = new int?[n, n, n];
+            int[,] arr2D = new int[n,n];
             List<int>[] dependsOn = new List<int>[n];
 
             int[] jobTime = Console.ReadLine().Split(' ').Select(x => int.Parse(x)).ToArray();
@@ -20,53 +20,32 @@ namespace Dynamic
                 var list = Console.ReadLine().Split(' ').Skip(1).Select(x => int.Parse(x)-1).ToList();
                 dependsOn[i] = list;
             }
+            
+            arr2D[0, 0] = 0;
+            for (int j = 1; j < n; j++) arr2D[0, j] = jobTime[0];
 
-            for (int k = 0; k < n; k++)
+            int currentJobTime;
+            int latestStartTime;
+            int prev;
+            for (int i = 1; i < n; i++)
             {
-                var realJobTime = jobTime[k];
-                jobTime[k] = 0;
-                arr3D[k, 0, 0] = jobTime[0];
-                for (int i = 1; i < n; i++)
+                for (int j = 0; j < n; j++)
                 {
-                    for (int j = 0; j < n; j++)
+                    currentJobTime = i == j ? 0 : jobTime[i];
+                    latestStartTime = 0;
+                    foreach (var x in dependsOn[i])
                     {
-                        if (arr3D[k, i-1, j] != null)
-                        {
-                            arr3D[k, i, j] = arr3D[k, i - 1, j];
-                            continue;
-                        }
-
-                        int slowestPrev = -1;
-                        foreach (var x in dependsOn[j])
-                        {
-                            var prev = arr3D[k, i - 1, x];
-                            if (prev == null) break;
-                            if (prev > slowestPrev) slowestPrev = (int) prev;
-                        }
-
-                        if (slowestPrev == -1) continue;
-                        arr3D[k, i, j] = slowestPrev + jobTime[j];
+                        prev = arr2D[x, j];
+                        if(prev > latestStartTime) latestStartTime = prev;
                     }
+                    arr2D[i, j] = latestStartTime + currentJobTime;
                 }
-                jobTime[k] = realJobTime;
             }
             int min = Int32.MaxValue;
-            for(int k = 0; k < n; k++)
-                if (arr3D[k, n - 1, n - 1] < min)
-                    min = (int) arr3D[k, n - 1, n - 1];
+            for(int j = 0; j < n; j++)
+                if (arr2D[n-1,j] < min)
+                    min = arr2D[n-1,j];
             Console.WriteLine(min);
         }
     }
 }
-
-
-
-
-//Hver column representerer et job
-//Hver row representere endnu et job startes/færdiggøres
-//Ved row 1 startes første job
-//Ved row 2 startes alle, som kun depender på job 1
-//Ved row 3 startes alle, som ikke depender på nogen, som ikke allerede er kort
-//Hver column representere det tidligste tidspunkt dette job kan være færdigt
-//Hver column bærer sin værdi med ned hver gang
-//Hver column tager den langsommeste af alle dem, som den venter på og lægger derefter sin egen tid oveni
