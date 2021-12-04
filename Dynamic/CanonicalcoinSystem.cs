@@ -19,74 +19,23 @@ namespace Dynamic
 
         private static bool IsItCanonical(int[] coinArr, int max)
         {
-            int?[] greedyArr = new int?[max];
-            int?[] dynamicArr = new int?[max];
+            int[] arr = new int[max];
+            arr[0] = 0;
 
-            greedyArr[0] = 0;
-            dynamicArr[0] = 0;
-
-            int? nextCoinCount;
+            int nextCoinCount;
             for (int i = 0; i < max; i++)
             {
-                int? currentCoinCountGreedy = greedyArr[i];
-                int? currentCoinCountDynamic = dynamicArr[i];
-                if (currentCoinCountDynamic != currentCoinCountGreedy) return false;
+                int currentCoinCountDynamic = arr[i];
                 
                 foreach (var coin in coinArr)
                 {
                     if(i + coin >= max) continue;
-                    nextCoinCount = greedyArr[i + coin];
-                    if (nextCoinCount == null) greedyArr[i + coin] = currentCoinCountGreedy + 1;
-                    
-                    nextCoinCount = dynamicArr[i + coin];
-                    if (nextCoinCount == null) dynamicArr[i + coin] = currentCoinCountDynamic + 1;
-                    else
-                    {
-                        if (currentCoinCountDynamic + 1 < nextCoinCount) dynamicArr[i+coin] = currentCoinCountDynamic + 1;
-                    }
+                    nextCoinCount = arr[i + coin];
+                    if (nextCoinCount == 0) arr[i + coin] = currentCoinCountDynamic + 1;
+                    else if (nextCoinCount > currentCoinCountDynamic + 1) return false;
                 }
             }
             return true;
-        }
-
-        private static int?[] DynamicGreedy(int[] coinArr, int max)
-        {
-            int?[] arr = new int?[max];
-
-            arr[0] = 0;
-            for (int i = 0; i < max; i++)
-            {
-                int? currentCoinCount = arr[i];
-                foreach (var coin in coinArr)
-                {
-                    if(i + coin >= max) continue;
-                    int? nextCoinCount = arr[i + coin];
-                    if (nextCoinCount == null) arr[i + coin] = currentCoinCount + 1;
-                }
-            }
-            return arr; 
-        }
-
-        private static int?[] Dynamic(int[] coinArr, int max)
-        {
-            int?[] arr = new int?[max];
-
-            arr[0] = 0;
-            for (int i = 0; i < max; i++)
-            {
-                int? currentCoinCount = arr[i];
-                foreach (var coin in coinArr)
-                {
-                    if(i + coin >= max) continue;
-                    int? nextCoinCount = arr[i + coin];
-                    if (nextCoinCount == null) arr[i + coin] = currentCoinCount + 1;
-                    else
-                    {
-                        if (currentCoinCount + 1 < nextCoinCount) arr[i+coin] = currentCoinCount + 1;
-                    }
-                }
-            }
-            return arr;
         }
     }
 }
