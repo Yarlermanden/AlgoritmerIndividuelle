@@ -10,25 +10,43 @@ namespace Dynamic
             int n = int.Parse(Console.ReadLine());
             var arr = Console.ReadLine().Split(' ').Select(x => int.Parse(x)).ToArray();
             
-            //sum of the two largest denominations
-            int maxToCheck = arr[arr.Length-1] + arr[arr.Length-2] + 1;
-
-            bool canonical = true;
-            var dynamicArr = Dynamic(arr, maxToCheck);
-            var greedyArr = DynamicGreedy(arr, maxToCheck);
-            for (int i = 1; i < maxToCheck; i++)
-            {
-                //int greedy = Greedy(arr, i);
-                int dynamic = (int)dynamicArr[i];
-                int greedy = (int)greedyArr[i];
-
-                //Console.WriteLine(greedy + ", " + dynamic);
-
-                if (greedy != dynamic) canonical = false;
-            }
+            int maxToCheck = arr[arr.Length-1] + arr[arr.Length-2];
+            var canonical = IsItCanonical(arr, maxToCheck);
 
             if(!canonical) Console.WriteLine("non-canonical");
             else Console.WriteLine("canonical");
+        }
+
+        private static bool IsItCanonical(int[] coinArr, int max)
+        {
+            int?[] greedyArr = new int?[max];
+            int?[] dynamicArr = new int?[max];
+
+            greedyArr[0] = 0;
+            dynamicArr[0] = 0;
+
+            int? nextCoinCount;
+            for (int i = 0; i < max; i++)
+            {
+                int? currentCoinCountGreedy = greedyArr[i];
+                int? currentCoinCountDynamic = dynamicArr[i];
+                if (currentCoinCountDynamic != currentCoinCountGreedy) return false;
+                
+                foreach (var coin in coinArr)
+                {
+                    if(i + coin >= max) continue;
+                    nextCoinCount = greedyArr[i + coin];
+                    if (nextCoinCount == null) greedyArr[i + coin] = currentCoinCountGreedy + 1;
+                    
+                    nextCoinCount = dynamicArr[i + coin];
+                    if (nextCoinCount == null) dynamicArr[i + coin] = currentCoinCountDynamic + 1;
+                    else
+                    {
+                        if (currentCoinCountDynamic + 1 < nextCoinCount) dynamicArr[i+coin] = currentCoinCountDynamic + 1;
+                    }
+                }
+            }
+            return true;
         }
 
         private static int?[] DynamicGreedy(int[] coinArr, int max)
@@ -47,23 +65,6 @@ namespace Dynamic
                 }
             }
             return arr; 
-        }
-
-        private static int Greedy(int[] arr, int max)
-        {
-            int count = 0;
-            int rest = max;
-            int coin = arr.Length-1;
-            while (rest > 0)
-            {
-                while (rest < arr[coin])
-                {
-                    coin--;
-                }
-                rest = rest - arr[coin];
-                count++;
-            }
-            return count;
         }
 
         private static int?[] Dynamic(int[] coinArr, int max)
