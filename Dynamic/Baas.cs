@@ -7,7 +7,7 @@ namespace Dynamic
 {
     public class Baas
     {
-        public static void Main()
+        public static void Main1()
         {
             int n = int.Parse(Console.ReadLine());
             int[,] arr2D = new int[n,n];
