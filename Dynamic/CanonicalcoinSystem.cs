@@ -5,7 +5,7 @@ namespace Dynamic
 {
     public class CanonicalcoinSystem
     {
-        public static void Main()
+        public static void Main1()
         {
             int n = int.Parse(Console.ReadLine());
             var arr = Console.ReadLine().Split(' ').Select(x => int.Parse(x)).ToArray();
