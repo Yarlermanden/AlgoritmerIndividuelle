@@ -1,3 +1,6 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
-ProfitablePizzas.Run();
+//ProfitablePizzas.Run();
+
+using DefaultNamespace;
+WateringGrass.Main();

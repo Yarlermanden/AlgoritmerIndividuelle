@@ -7,7 +7,7 @@ namespace Dynamic
 {
     public class NestedDolls
     {
-        public static void Main1()
+        public static void Main()
         {
             int n = int.Parse(Console.ReadLine());
             for (int i = 0; i < n; i++) NestedDoll();
@@ -36,8 +36,31 @@ namespace Dynamic
             
             //Maybe it would be nice to sort by X and Y to ensure we either get all the biggest or smallest dolls first
             
-            int result = SolveDynamically(dolls);
-            Console.WriteLine(result);
+            //int result = SolveDynamically(dolls);
+            //Console.WriteLine(result);
+            dolls = dolls.OrderBy(x => x.W).OrderBy(x => x.H).ToArray();
+
+            while (dolls.Length > 0)
+            {
+                dolls = Iterate(dolls);
+            }
+        }
+
+        private static Doll[] Iterate(Doll[] dolls)
+        {
+            int n = dolls.Length;
+            Doll[,] arr2D = new Doll[n, n];
+            var tempDoll = new Doll(dolls[0]);
+            arr2D[0, 0] = tempDoll;
+
+            for (int i = 1; i < n; i++)
+            {
+                for (int j = i; j < n; j++)
+                {
+                    //Check all dolls < j at i-1 for which can fit doll j and which has largest count
+                    //Check if dolls[j] can fit inside arr2d[
+                }
+            }
         }
 
         private static int SolveDynamically(Doll[] dolls)
@@ -70,11 +93,18 @@ namespace Dynamic
         {
             public int W { get; set; }
             public int H { get; set; }
+            public int NestedCount { get; set; }
             public Doll Inside { get; set; }
             public Doll(int w, int h)
             {
                 W = w;
                 H = h;
+            }
+
+            public Doll(Doll doll)
+            {
+                W = doll.W;
+                H = doll.H;
             }
         }
     }
