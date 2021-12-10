@@ -5,4 +5,6 @@
 using DefaultNamespace;
 //WateringGrass.Main();
 //Classrooms.Main();
-Shopaholic.Main();
+//Shopaholic.Main();
+//ColoringSocks.Main();
+BirdsOnAWire.Main();
