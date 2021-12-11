@@ -7,4 +7,5 @@ using DefaultNamespace;
 //Classrooms.Main();
 //Shopaholic.Main();
 //ColoringSocks.Main();
-BirdsOnAWire.Main();
+//BirdsOnAWire.Main();
+Atlantis.Main();
