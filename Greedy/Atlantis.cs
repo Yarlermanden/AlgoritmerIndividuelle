@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Collections.Generic;
 
 public class Atlantis
 {
@@ -12,45 +13,65 @@ public class Atlantis
             var arr = Console.ReadLine().Split(' ').Select(x => int.Parse(x)).ToArray();
             int t = arr[0]; //distance
             int h = arr[1]; //height of store
-            stores[i] = new Store(t, h);
+            stores[i] = new Store(t, h, i);
         }
-        //Array.Sort(stores, (x,y) => (x.LatestStartingTime != y.LatestStartingTime) ? x.LatestStartingTime.CompareTo(y.LatestStartingTime) : x.Distance.CompareTo(y.Distance));
-        Array.Sort(stores, (x, y) => (x.LatestStartingTime != y.LatestStartingTime) ? y.LatestStartingTime.CompareTo(x.LatestStartingTime) : x.Distance.CompareTo(y.Distance));
-        //Array.Sort(stores, (x,y) => (x.LatestPoint != y.LatestPoint) ? x.LatestPoint.CompareTo(y.LatestPoint) : y.Distance.CompareTo(x.Distance));
+        Array.Sort(stores, (x, y) => x.Height.CompareTo(y.Height));
         int count = 0;
-        //long time = stores[0].Height;
-        long time = stores[0].Height;
+        int time = 0;
+        SortedSet<Store> sortedSet = new SortedSet<Store>(new Comparer()); //Add comparer
+        Store worstStore;
+        Store current;
+        int diffDistance;
         for (int i = 0; i < n; i++)
         {
-            //if (time + stores[i].Distance < stores[i].Height)
-            //if(time >= stores[i].Height)
-            //if(time >= stores[i].LatestStartingTime)
-            if(time-stores[i].Distance >= 0)
-                //seneste starting tidspunkt + distance - hvis den overstiger time,
+            current = stores[i];
+            if (current.LatestStartingTime < time) //Can't just take 
             {
-                count++;
-                time -= stores[i].Distance;
-                Console.WriteLine("taking " + stores[i].LatestStartingTime + " which sets time to " + time);
+                if(count == 0) continue;
+                worstStore = sortedSet.Max();
+                diffDistance = worstStore.Distance - current.Distance;
+                if (diffDistance > 0)
+                {
+                    sortedSet.Add(current);
+                    sortedSet.Remove(worstStore);
+                    time -= diffDistance;
+                }
             }
             else
             {
-                Console.WriteLine("Didn't take: " + stores[i].LatestStartingTime + " as " + time + " + " + stores[i].Distance + " is larger than " + stores[i].Height);
+                count++;
+                time += current.Distance;
+                sortedSet.Add(current);
             }
         }
         Console.WriteLine(count);
     }
 
-    private class Store
+    private class Comparer : IComparer<Store>
+    {
+        public int Compare(Store x, Store y)
+        {
+            return x.Distance.CompareTo(y.Distance);
+        }
+    }
+
+    private class Store : IComparable<Store>
     {
         public int Distance { get; set; }
         public int Height { get; set; }
-        public long LatestStartingTime { get; set; }
-        public Store(int t, int h)
+        public int LatestStartingTime { get; set; }
+        public int Priority { get; set; }
+        public Store(int t, int h, int id)
         {
             Distance = t;
             Height = h;
-            //LatestPoint = Distance + Height;
             LatestStartingTime = Height - Distance;
+            Priority = id;
+        }
+
+        public int CompareTo(Store other)
+        {
+            return Distance.CompareTo(other.Distance);
         }
     }
 }
