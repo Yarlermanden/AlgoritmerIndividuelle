@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 public class RestaurantOrders
@@ -41,19 +42,38 @@ public class RestaurantOrders
             bool exist = false;
             bool multiple = false;
             int menuItem = 0;
+            List<int> knownItems = new List<int>();
             for (int j = 0; j < menu.Length; j++)
             {
+                if (multiple) break;
                 if (arr2D[order, j] != 0)
                 {
-                    //string s = BackTrack(order, j, menu[j]);
-                    string s = BackTrack(order, j+1, menu);
-                    Console.WriteLine(s);
                     if (!exist)
                     {
                         exist = true;
-                        menuItem = j;
+                        knownItems = BackTrack(order, j + 1, menu);
+                        knownItems = knownItems.OrderBy(x => x).ToList();
+                        Console.WriteLine(knownItems[0] + " " + knownItems[1] + " " + knownItems[2] + " " + knownItems[3]);
                     }
-                    else multiple = true;
+                    else
+                    {
+                        var list1 = BackTrack(order, j + 1, menu);
+                        Console.WriteLine(list1[0] + " " + list1[1] + " " + list1[2] + " " + list1[3]);
+                        if (list1.Count != knownItems.Count)
+                        {
+                            multiple = true;
+                            break;
+                        }
+                        list1 = list1.OrderBy(x => x).ToList();
+                        for (int k = 0; k < list1.Count; k++)
+                        {
+                            if (knownItems[k] != list1[k])
+                            {
+                                multiple = true;
+                                break;
+                            }
+                        }
+                    }
                 }
             }
             
@@ -61,6 +81,9 @@ public class RestaurantOrders
             else if(multiple) Console.WriteLine("Ambiguous");
             else
             {
+                Console.Write(knownItems[0]);
+                for(int i = 1; i < knownItems.Count; i++) Console.Write(" " + knownItems[i]);
+                Console.WriteLine();
                 //string s = BackTrack(order, menuItem, menu);
                 //Console.WriteLine(s);
             }
@@ -73,13 +96,26 @@ public class RestaurantOrders
     }
 
     //private static string BackTrack(int i, int j, int menuCost)
-    private static string BackTrack(int i, int j, int[] menu)
+    private static List<int> BackTrack(int i, int j, int[] menu)
     {
         //if (i == 0) return j.ToString();
-        if (i == 0) return "";
+        if (i == 0) return new List<int>();
         //int oldJ = arr2D[i, j];
         //BackTrack(arr2D[i - menuCost, oldJ];
         //return j + " " + BackTrack(i-menuCost, arr2D[i,j], )
-        return j + " " + BackTrack(i - menu[j-1], arr2D[i, j-1], menu);
+        //return j + " " + BackTrack(i - menu[j-1], arr2D[i, j-1], menu);
+        var list = BackTrack(i - menu[j - 1], arr2D[i, j - 1], menu);
+        list.Add(j);
+        return list;
+    }
+
+    public class Node
+    {
+        public List<int> Items { get; set; }
+        public bool Ambiguous { get; set; }
+        public Node(List<int> items)
+        {
+            Items = items;
+        }
     }
 }
