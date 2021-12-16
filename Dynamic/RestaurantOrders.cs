@@ -7,19 +7,15 @@ public class RestaurantOrders
     private static int[,] arr2D;
     public static void Main()
     {
-        //Make a 2d array which is a wide as the amount of orders and as deep as the max amount of turns
         int n = int.Parse(Console.ReadLine());
         var menu = Console.ReadLine().Split(' ').Select(x => int.Parse(x)).ToArray();
         int ordersPlaced = int.Parse(Console.ReadLine());
         var costs = Console.ReadLine().Split(' ').Select(x => int.Parse(x)).ToArray();
-        int minOrder = menu.Min();
         int maxCost = costs.Max();
 
-        //int maxTurns = maxCost / minOrder + 1;
         arr2D = new int[maxCost + menu.Max()+1, menu.Length];
         for (int j = 0; j < menu.Length; j++)
         {
-            //initialize
             arr2D[menu[j], j] = j+1;
         }
 
@@ -31,6 +27,15 @@ public class RestaurantOrders
                 {
                     for(int k = 0; k < menu.Length; k++)
                     {
+                        if (arr2D[i + menu[k], k] != 0)
+                        {
+                            //Tjek om de her to er ens
+                            var list1 = BackTrack(i + menu[k], k, menu);
+                            var list2 = BackTrack(i, j, menu);
+                            list2.Add(j+1);
+                            //list1.OrderBy(x => x).Intersect(list2.OrderBy(x => x));
+                            //list1.SequenceEqualsIgnoreOrder
+                        }
                         arr2D[i + menu[k], k] = j+1;
                     }
                 }
@@ -53,12 +58,12 @@ public class RestaurantOrders
                         exist = true;
                         knownItems = BackTrack(order, j + 1, menu);
                         knownItems = knownItems.OrderBy(x => x).ToList();
-                        Console.WriteLine(knownItems[0] + " " + knownItems[1] + " " + knownItems[2] + " " + knownItems[3]);
+                        //Console.WriteLine(knownItems[0] + " " + knownItems[1] + " " + knownItems[2] + " " + knownItems[3]);
                     }
                     else
                     {
                         var list1 = BackTrack(order, j + 1, menu);
-                        Console.WriteLine(list1[0] + " " + list1[1] + " " + list1[2] + " " + list1[3]);
+                        //Console.WriteLine(list1[0] + " " + list1[1] + " " + list1[2] + " " + list1[3]);
                         if (list1.Count != knownItems.Count)
                         {
                             multiple = true;
@@ -107,15 +112,5 @@ public class RestaurantOrders
         var list = BackTrack(i - menu[j - 1], arr2D[i, j - 1], menu);
         list.Add(j);
         return list;
-    }
-
-    public class Node
-    {
-        public List<int> Items { get; set; }
-        public bool Ambiguous { get; set; }
-        public Node(List<int> items)
-        {
-            Items = items;
-        }
     }
 }

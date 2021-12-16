@@ -8,7 +8,7 @@ namespace DivideAndConquer
 {
     public class ClosestPairUniform
     {
-        public static void Main(string[] args)
+        public static void Main1(string[] args)
         {
             var n = int.Parse(Console.ReadLine());
             while (n != 0)
